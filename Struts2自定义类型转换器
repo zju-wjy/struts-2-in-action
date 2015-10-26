@@ -1,0 +1,40 @@
+Struts2有两种“类型转换器”
+局部类型转换器：对某个Action起作用
+全局类型转换器：对所有Action的这种类型起作用
+
+1。局部类型转换器
+1)如何自定义类型转换器
+创建类型转换器类，继承DefaultTypeConverter，重写convertValue方法
+	@Override
+	public Object convertValue(Map<String, Object> context, Object value,
+			Class toType) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		try{
+			if(toType == Date.class){//当字符串向Date类型转换时
+				String[] params = (String[]) value;
+				return dateFormat.parse(params[0]);
+			}else if(toType == String.class){//当Date转换为字符串时
+				Date date = (Date)value;
+				return dateFormat.format(date);
+			}
+		}catch(Exception e){
+			return null;
+		}
+		return null;
+	}
+
+2)定义好了类型转换器，下一步就是要进行注册
+在Action类所在的包下放置ActionClassName-conversion.properties文件。
+	其中ActionClassName为Action的类名，后面的-conversion.properties为固定写法。
+在ActionClassName-conversion.properties文件中注册类型转换器即可
+在properties文件中的内容为：属性名称=类型转换器的全类名
+	例如：birthday=cn.itcast.type.converter.DateTypeConverter
+
+2.全局类型转换器
+1）定义类型转换器类，与局部类型转换器相同
+2）注册类型转换器，在WEB-INF/classes下放置xwork-conversion.properties文件。
+在properties文件中的内容为：待转换的类型=类型转换器的全类名
+	例如：java.util.Date=cn.itcast.type.converter.DateTypeConverter
+
+3.什么时候使用全局什么时候使用局部类型转换器
+拿日期来说，如果全都是20151026这样的格式则使用全局转换器，否则使用局部转换器。根据实际业务需求来确定使用局部类型转换器还是全局类型转换器。
