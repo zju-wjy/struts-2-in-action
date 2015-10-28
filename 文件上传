@@ -1,0 +1,24 @@
+文件上传
+1，在WEB-INF/lib下加入commons-fileupload-1.2.1.jar、commons-io-1.3.2.jar
+2，把form表的enctype设置为："multipart/form-data"，如下：
+<form enctype="multipart/form-data" action="${pageContext.request.contextPath}/***.action" method="post">
+	<input type="file" name="uploadimage">
+</form>
+3，在Action类中添加以下属性
+	public class HelloWorldAction{
+		private File uploadimage;//得到上传的文件
+		private String uploadimageContentType;//得到文件的类型
+		private String uploadimageFileName;//得到文件的名称
+		//这里省略了属性的getter/setter方法
+		public String upload() throws Exception{
+			String realpath = ServletActionContext.getServletContext().getRealPath("/images");
+			File file = new File(realpath);
+			if(!file.exists()){
+				file.mkdirs();
+			}
+			FileUtils.copyFile(uploadimage,new File(file,uploadimageFileName));
+			return "success";
+		}
+	}
+
+多文件上传，将上述第三部属性的类型定义为数组类型。
