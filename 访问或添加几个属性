@@ -1,0 +1,25 @@
+访问或添加request/session/application属性。
+
+Struts2中Action并没有使用到ServletAPI，所以我们在Action的方法中无法得到request对象或者session对象和servletcontext对象。因此我们需要去考虑如何将属性放入这三个范围。
+
+Struts2对这三个范围做了封装，通过ActionContext可以将属性添加至这三个范围。
+	ActionContext ctx = ActionContext.getContext();
+	ctx.getApplication().put("app","应用范围");//往Servletcontext里放入app
+	ctx.getSession().put("ses","session范围");//往session里放入ses
+	ctx.put("req","request范围");//往request里放入req
+
+然后通过EL表达式访问这三个属性
+	${applicationScope.app }<br>
+    ${sessionScope.ses }<br>
+    ${requestScope.req }<br>
+
+获取HttpServletRequest/HttpSession/ServletContext/HttpServletResponse对象
+方法一：通过ServletActionContext类直接获取
+	public String rsa() throws Exception{
+		HttpServletRequest request = ServletActionContext.getRequest();
+		ServletContext servletContext = ServletActionContext.getServletContext();
+		request.getSession();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		return "scope";
+	}
+方法二：实现指定接口，由Struts框架运行时注入
